@@ -1,0 +1,34 @@
+{
+    "name": "dragutin/sitemap-crawler",
+    "description": "Crawler for site using robots and sitema",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Cirko",
+            "email": "dragonmen@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "ext-curl": "*",
+        "vipnytt/sitemapparser": "^1.1",
+        "guzzlehttp/guzzle": "^7.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "dragutin\\": "src/"
+        },
+        "files": [
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "GuzzleHttp\\Tests\\": "tests/"
+        }
+    },
+    "suggest": {
+        "ext-curl": "Required for CURL handler support",
+        "ext-intl": "Required for Internationalized Domain Name (IDN) support",
+        "psr/log": "Required for using the Log middleware"
+    }
+}
