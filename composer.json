@@ -1,6 +1,6 @@
 {
     "name": "dr4g0nsr/sitemap-crawler",
-    "description": "Crawler for site using robots and sitema",
+    "description": "Crawler for any type of site using robots.txt and sitemap.xml as the source of URL. Useful for cache regenerating.",
     "type": "library",
     "homepage": "https://cirko.me",
     "license": [
