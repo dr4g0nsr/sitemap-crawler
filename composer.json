@@ -18,6 +18,8 @@
         "vipnytt/sitemapparser": "^1.1",
         "guzzlehttp/guzzle": "^7.5"
     },
+    "require-dev": {
+    },
     "autoload": {
         "psr-4": {
             "dr4g0nsr\\": "src/"
