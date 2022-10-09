@@ -2,6 +2,10 @@
     "name": "dr4g0nsr/sitemap-crawler",
     "description": "Crawler for site using robots and sitema",
     "type": "library",
+    "homepage": "https://cirko.me",
+    "license": [
+       "OSL-3.0"
+    ],
     "authors": [
         {
             "name": "Dragutin Cirkovic",
