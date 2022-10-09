@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace dragutin;
+namespace dr4g0nsr;
 
 use \GuzzleHttp as http;
 use vipnytt\SitemapParser;

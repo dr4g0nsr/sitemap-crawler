@@ -1,10 +1,10 @@
 {
-    "name": "dragutin/sitemap-crawler",
+    "name": "dr4g0nsr/sitemap-crawler",
     "description": "Crawler for site using robots and sitema",
     "type": "library",
     "authors": [
         {
-            "name": "Cirko",
+            "name": "Dragutin Cirkovic",
             "email": "dragonmen@gmail.com"
         }
     ],
@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "dragutin\\": "src/"
+            "dr4g0nsr\\": "src/"
         },
         "files": [
         ]
