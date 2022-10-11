@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace dr4g0nsr;
 
@@ -22,13 +22,19 @@ class SitemapCrawler {
     private $sleep = 0;
     private $requestRate = 0;
     private $excluded = [];
+    private $agentID = 'Sitemap Crawler' + self::SC_VERSION;
+    private $settings = [];
+    private $temporarySettings = [];
 
-    public function __construct($settings = NULL) {
+    public function __construct($settings = []) {
         foreach ($this->prerequisites as $ext) {
             if (!function_exists($ext)) {
                 print "Prerequisites failed: $ext\n";
                 die;
             }
+        }
+        if (!empty($settings)) {
+            $this->settings = $settings;
         }
     }
 
@@ -41,8 +47,13 @@ class SitemapCrawler {
         }
         require($path);
         foreach ($settings as $setting => $val) {
-            $this->$setting = $val;
+            $this->temporarySettings[$setting] = $val;
         }
+        $this->settings = array_merge($this->temporarySettings, $this->settings);
+    }
+
+    public function getSettings() {
+        return $this->settings;
     }
 
     public static function version() {
@@ -64,9 +75,25 @@ class SitemapCrawler {
         return [$code, $type, $body, $bodyRaw];
     }
 
-    private function sitemapParser($url) {
-        $parser = new SitemapParser('MyCustomUserAgent');
+    private function findSitemap(&$parser, $url) {
         $parser->parseRecursive($url);
+
+        $urlCounter = count($parser->getURLs());
+        if ($urlCounter < 1) {
+            $url = str_replace('/robots.txt', '/sitemap.xml', $url);
+            $parser->parseRecursive($url);
+        }
+        $urlCounter = count($parser->getURLs());
+        if ($urlCounter < 1) {
+            return false;
+        }
+        return true;
+    }
+
+    private function sitemapParser($url) {
+        $parser = new SitemapParser($this->agentID);
+        $this->findSitemap($parser, $url);
+        die;
         $sitemaps = [];
         foreach ($parser->getSitemaps() as $url => $tags) {
             $sitemaps[$url] = $tags;
@@ -89,7 +116,7 @@ class SitemapCrawler {
         $ok = $bad = $cnt = 0;
         $start = microtime(true);
         $total = count($sitemap['urls']);
-        if ($total===0) {
+        if ($total === 0) {
             $this->log("No pages found!");
             die;
         }
