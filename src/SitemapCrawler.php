@@ -22,7 +22,7 @@ class SitemapCrawler {
     private $sleep = 0;
     private $requestRate = 0;
     private $excluded = [];
-    private $agentID = 'Sitemap Crawler' . self::SC_VERSION;
+    private $agentID = 'Sitemap Crawler ' . self::SC_VERSION;
     private $settings = [];
     private $temporarySettings = [];
 
@@ -61,7 +61,13 @@ class SitemapCrawler {
     }
 
     private function guzzlePage($url) {
-        $this->httpClient = new \GuzzleHttp\Client();
+        $this->httpClient = new \GuzzleHttp\Client(
+                ['defaults' => [
+                'verify' => false,
+                'connect_timeout' => 5,
+                'timeout' => 10,
+            ], 'headers' => ['Accept-Encoding' => 'gzip, deflate']]
+        );
         try {
             $response = $this->httpClient->request('GET', $url);
         } catch (Exception $e) {
@@ -101,9 +107,12 @@ class SitemapCrawler {
     }
 
     private function sitemapParser($url) {
-        $parser = new SitemapParser($this->agentID);
+        $parser = new SitemapParser($this->agentID, ['guzzle' => ['defaults' => [
+                    'verify' => false,
+                    'connect_timeout' => 5,
+                    'timeout' => 10,
+                ], 'headers' => ['Accept-Encoding' => 'gzip, deflate']]]);
         $this->findSitemap($parser, $url);
-        die;
         $sitemaps = [];
         foreach ($parser->getSitemaps() as $url => $tags) {
             $sitemaps[$url] = $tags;
@@ -112,14 +121,26 @@ class SitemapCrawler {
         foreach ($parser->getURLs() as $url => $tags) {
             $urls[$url] = $tags;
         }
-        return ['robots' => $sitemaps, "urls" => $urls];
+        return ['sources' => $sitemaps, "urls" => $urls];
     }
 
     public function getSitemap($url) {
-        $robotsLink = $url . '/robots.txt';
-        $this->log("Robots: {$robotsLink}");
+        $parse = parse_url($url);
+        if (!isset($parse['path']) || $parse['path'] == '') {
+            $robotsLink = $url . '/robots.txt';
+            $sitemapLink = $url . '/sitemap.xml';
+            $robots = $this->guzzlePage($robotsLink);
+            if (!$robots[0] != 200 || !strstr(strtolower($robots[3]), 'sitemap')) {
+                $crawlLink = $sitemapLink;
+            } else {
+                $crawlLink = $robotsLink;
+            }
+        } else {
+            $crawlLink = $url;
+        }
+        $this->log("Crawl link: {$crawlLink}");
         /** @var SitemapParser $sitemap */
-        return $this->sitemapParser($robotsLink);
+        return $this->sitemapParser($crawlLink);
     }
 
     public function crawlURLS($sitemap) {
