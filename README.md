@@ -37,4 +37,4 @@ $sitemap = $crawler->getSitemap($url);
 $crawler->crawlURLS($sitemap);
 ```
 
-That would be simplest code, you can also find it in test subdir under vendor/dr4g0nsr/SitemapCrawler/.
+That would be simplest code, you can also find it in test subdir under vendor/dr4g0nsr/SitemapCrawler/test.
