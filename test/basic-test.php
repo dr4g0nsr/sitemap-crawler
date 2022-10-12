@@ -13,8 +13,6 @@ $httpClient = new \GuzzleHttp\Client();
 $url = 'https://candymapper.com';
 print "Crawler version: " . SitemapCrawler::version() . PHP_EOL;
 
-class SitemapCrawlerX{}
-
 $crawler = new SitemapCrawler(['sleep' => 5]);
 $crawler->loadConfig(__DIR__ . '/config.php');
 $sitemap = $crawler->getSitemap($url);
