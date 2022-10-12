@@ -6,6 +6,12 @@ Crawler using sitemap to crawl site/regenerate cache.
 
 Files are not stored, point is just to trigger url.
 
+## Get code using composer
+
+```
+composer require dr4g0nsr\SitemapCrawler
+```
+
 ## How to implement
 
 Create config.php:
@@ -31,4 +37,4 @@ $sitemap = $crawler->getSitemap($url);
 $crawler->crawlURLS($sitemap);
 ```
 
-That would be simplest code, you can also find it in test subdir under vendor/dr4g0nsr/SitemapCrawler.
+That would be simplest code, you can also find it in test subdir under vendor/dr4g0nsr/SitemapCrawler/.
