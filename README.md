@@ -2,10 +2,27 @@
 
 # Sitemap Crawler
 
-Crawler using sitemap to crawl site/regenerate cache
+Crawler using sitemap to crawl site/regenerate cache.
 
-## Getting started
+Files are not stored, point is just to trigger url.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## How to implement
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Use code like this:
+
+```
+require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/config.php';
+
+use dr4g0nsr\SitemapCrawler;
+
+$url = 'https://candymapper.com';
+print "Crawler version: " . SitemapCrawler::version() . PHP_EOL;
+
+$crawler = new SitemapCrawler(['sleep' => 5]);
+$crawler->loadConfig(__DIR__ . '/config.php');
+$sitemap = $crawler->getSitemap($url);
+$crawler->crawlURLS($sitemap);
+```
+
+That would be simplest code, you can also find it in test subdir under vendor/dr4g0nsr/SitemapCrawler.
