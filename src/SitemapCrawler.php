@@ -20,12 +20,16 @@ class SitemapCrawler {
     private $httpClient = NULL;
     private $prerequisites = ["curl_init", "mb_language"];
     private $sleep = 0;
-    private $requestRate = 0;
     private $excluded = [];
     private $agentID = 'Sitemap Crawler ' . self::SC_VERSION;
     private $settings = [];
     private $temporarySettings = [];
 
+    /**
+     * Inject settings here using array, preferably loaded from config or automated
+     * 
+     * @param array $settings
+     */
     public function __construct(array $settings = []) {
         foreach ($this->prerequisites as $ext) {
             if (!function_exists($ext)) {
@@ -38,10 +42,23 @@ class SitemapCrawler {
         }
     }
 
-    public static function version() {
+    /**
+     * Static function to check version of class
+     * 
+     * @return string
+     */
+    public static function version(): string {
         return self::SC_VERSION;
     }
 
+    /**
+     * Loads config and merge current one with loaded
+     * 
+     * It will override settings injected at constructor or default ones if constructor didn't use any settings
+     * 
+     * @param string $path Path to config.php, if ommited it will use default one from path where tests are, which is probably not what you want
+     * @throws \Exception Exception if config does not exists
+     */
     public function loadConfig($path = NULL) {
         if (empty($path)) {
             $path = __DIR__ . '/../config.php';
@@ -56,11 +73,28 @@ class SitemapCrawler {
         $this->settings = array_merge($this->temporarySettings, $this->settings);
     }
 
+    /**
+     * Return settings stored internally
+     * 
+     * @return type
+     */
     public function getSettings() {
         return $this->settings;
     }
 
-    private function guzzlePage($url) {
+    /**
+     * Use guzzle to get page
+     * 
+     * Returns four values as the result of operation:
+     * code - should be 200 if everything is normal, it refers to http code
+     * type - actual content-type from response
+     * body - body of response
+     * bodyraw - original body of response with not filters and stuff
+     * 
+     * @param string $url URL to get, can be http or https, ssl/tls is not checked for validity, self-signed will work
+     * @return array Returning array of 4 values from executing request: code, type, body and raw body
+     */
+    private function guzzlePage(string $url): array {
         $this->httpClient = new \GuzzleHttp\Client(
                 ['defaults' => [
                 'verify' => false,
@@ -71,7 +105,7 @@ class SitemapCrawler {
         try {
             $response = $this->httpClient->request('GET', $url);
         } catch (Exception $e) {
-            
+            // No exception
         }
         $code = $response->getStatusCode(); // 200
         $type = $response->getHeaderLine('content-type'); // 'application/json; charset=utf8'
