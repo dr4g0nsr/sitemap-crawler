@@ -22,7 +22,7 @@ class SitemapCrawler {
     private $sleep = 0;
     private $requestRate = 0;
     private $excluded = [];
-    private $agentID = 'Sitemap Crawler' + self::SC_VERSION;
+    private $agentID = 'Sitemap Crawler' . self::SC_VERSION;
     private $settings = [];
     private $temporarySettings = [];
 
