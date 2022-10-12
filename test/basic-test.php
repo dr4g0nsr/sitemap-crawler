@@ -15,7 +15,6 @@ print "Crawler version: " . SitemapCrawler::version() . PHP_EOL;
 
 class SitemapCrawlerX{}
 
-$crawler = new SitemapCrawlerX(['sleep' => 5]);
 $crawler = new SitemapCrawler(['sleep' => 5]);
 $crawler->loadConfig(__DIR__ . '/config.php');
 $sitemap = $crawler->getSitemap($url);
