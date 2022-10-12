@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace dr4g0nsr;
 
@@ -26,7 +26,7 @@ class SitemapCrawler {
     private $settings = [];
     private $temporarySettings = [];
 
-    public function __construct($settings = []) {
+    public function __construct(array $settings = []) {
         foreach ($this->prerequisites as $ext) {
             if (!function_exists($ext)) {
                 print "Prerequisites failed: $ext\n";
@@ -36,6 +36,10 @@ class SitemapCrawler {
         if (!empty($settings)) {
             $this->settings = $settings;
         }
+    }
+
+    public static function version() {
+        return self::SC_VERSION;
     }
 
     public function loadConfig($path = NULL) {
@@ -56,10 +60,6 @@ class SitemapCrawler {
         return $this->settings;
     }
 
-    public static function version() {
-        return self::SC_VERSION;
-    }
-
     private function guzzlePage($url) {
         $this->httpClient = new \GuzzleHttp\Client();
         try {
@@ -76,12 +76,22 @@ class SitemapCrawler {
     }
 
     private function findSitemap(&$parser, $url) {
-        $parser->parseRecursive($url);
+        try {
+            $parser->parseRecursive($url);
+        } catch (Exception $e) {
+            print $e;
+            die;
+        }
 
         $urlCounter = count($parser->getURLs());
         if ($urlCounter < 1) {
             $url = str_replace('/robots.txt', '/sitemap.xml', $url);
-            $parser->parseRecursive($url);
+            try {
+                $parser->parseRecursive($url);
+            } catch (Exception $e) {
+                print $e;
+                die;
+            }
         }
         $urlCounter = count($parser->getURLs());
         if ($urlCounter < 1) {
