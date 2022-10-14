@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace dr4g0nsr;
 
-use \GuzzleHttp as http;
-use vipnytt\SitemapParser;
-use vipnytt\SitemapParser\Exceptions\SitemapParserException;
-
 /**
  * Main class for sitemap crawl
  *
@@ -17,13 +13,13 @@ class SitemapCrawler {
 
     const SC_VERSION = "1.0a";
 
-    private $httpClient = NULL;
     private $prerequisites = ["curl_init", "mb_language"];
     private $sleep = 0;
     private $excluded = [];
-    private $agentID = 'Sitemap Crawler ' . self::SC_VERSION;
     private $settings = [];
     private $temporarySettings = [];
+    private $guzzleURL = NULL;
+    private $sitemapGet = NULL;
 
     /**
      * Inject settings here using array, preferably loaded from config or automated
@@ -40,6 +36,8 @@ class SitemapCrawler {
         if (!empty($settings)) {
             $this->settings = $settings;
         }
+        $this->guzzleURL = new GuzzleURL();
+        $this->sitemapGet = new SitemapGet();
     }
 
     /**
@@ -83,95 +81,6 @@ class SitemapCrawler {
     }
 
     /**
-     * Use guzzle to get page
-     * 
-     * Returns four values as the result of operation:
-     * code - should be 200 if everything is normal, it refers to http code
-     * type - actual content-type from response
-     * body - body of response
-     * bodyraw - original body of response with not filters and stuff
-     * 
-     * @param string $url URL to get, can be http or https, ssl/tls is not checked for validity, self-signed will work
-     * @return array Returning array of 4 values from executing request: code, type, body and raw body
-     */
-    private function guzzlePage(string $url): array {
-        $this->httpClient = new \GuzzleHttp\Client(
-                ['defaults' => [
-                'verify' => false,
-                'connect_timeout' => 5,
-                'timeout' => 10,
-            ], 'headers' => ['Accept-Encoding' => 'gzip, deflate']]
-        );
-        try {
-            $response = $this->httpClient->request('GET', $url);
-        } catch (Exception $e) {
-            // No exception
-        }
-        $code = $response->getStatusCode(); // 200
-        $type = $response->getHeaderLine('content-type'); // 'application/json; charset=utf8'
-        $body = $response->getBody(); // '{"id": 1420053, "name": "guzzle", ...}'
-        $bodyRaw = $body->getContents();
-
-        return [$code, $type, $body, $bodyRaw];
-    }
-
-    /**
-     * Get URL list using recursive method
-     * 
-     * @param type $parser
-     * @param type $url
-     * @return boolean
-     */
-    private function sitemapParserGet(&$parser, $url) {
-        try {
-            $parser->parseRecursive($url);
-        } catch (Exception $e) {
-            print $e;
-            die;
-        }
-
-        $urlCounter = count($parser->getURLs());
-        if ($urlCounter < 1) {
-            $url = str_replace('/robots.txt', '/sitemap.xml', $url);
-            try {
-                $parser->parseRecursive($url);
-            } catch (Exception $e) {
-                print $e;
-                die;
-            }
-        }
-        $urlCounter = count($parser->getURLs());
-        if ($urlCounter < 1) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Get sitemap and URL list using SitemapParser class
-     * 
-     * @param string $url Base URL
-     * @return array Array of sources and urls
-     */
-    private function sitemapParser(string $url): array {
-        $parser = new SitemapParser($this->agentID, ['guzzle' => ['defaults' => [
-                    'verify' => false,
-                    'connect_timeout' => 5,
-                    'timeout' => 10,
-                ], 'headers' => ['Accept-Encoding' => 'gzip, deflate']]]);
-        $this->sitemapParserGet($parser, $url);
-        $sitemaps = [];
-        foreach ($parser->getSitemaps() as $url => $tags) {
-            $sitemaps[$url] = $tags;
-        }
-        $urls = [];
-        foreach ($parser->getURLs() as $url => $tags) {
-            $urls[$url] = $tags;
-        }
-        return ['sources' => $sitemaps, "urls" => $urls];
-    }
-
-    /**
      * Get list of URLs using robots.txt or sitemap.xml
      * 
      * First try to use robots.txt, if it doesn't have sitemap.xml
@@ -185,7 +94,7 @@ class SitemapCrawler {
         if (!isset($parse['path']) || $parse['path'] == '') {
             $robotsLink = $url . '/robots.txt';
             $sitemapLink = $url . '/sitemap.xml';
-            $robots = $this->guzzlePage($robotsLink);
+            $robots = $this->guzzleURL->guzzlePage($robotsLink);
             if (!$robots[0] != 200 || !strstr(strtolower($robots[3]), 'sitemap')) {
                 $crawlLink = $sitemapLink;
             } else {
@@ -195,8 +104,7 @@ class SitemapCrawler {
             $crawlLink = $url;
         }
         $this->log("Crawl link: {$crawlLink}");
-        /** @var SitemapParser $sitemap */
-        return $this->sitemapParser($crawlLink);
+        return $this->sitemapGet->sitemapParser($crawlLink);
     }
 
     /**
@@ -216,7 +124,7 @@ class SitemapCrawler {
             if (in_array($url, $this->excluded)) {
                 continue;
             }
-            $result = $this->guzzlePage($url);
+            $result = $this->guzzleURL->guzzlePage($url);
             if ($result[0] > 199 && $result[0] < 300) {
                 $ok++;
             } else {
