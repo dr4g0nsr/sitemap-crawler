@@ -115,7 +115,14 @@ class SitemapCrawler {
         return [$code, $type, $body, $bodyRaw];
     }
 
-    private function findSitemap(&$parser, $url) {
+    /**
+     * Get URL list using recursive method
+     * 
+     * @param type $parser
+     * @param type $url
+     * @return boolean
+     */
+    private function sitemapParserGet(&$parser, $url) {
         try {
             $parser->parseRecursive($url);
         } catch (Exception $e) {
@@ -140,13 +147,19 @@ class SitemapCrawler {
         return true;
     }
 
-    private function sitemapParser($url) {
+    /**
+     * Get sitemap and URL list using SitemapParser class
+     * 
+     * @param string $url Base URL
+     * @return array Array of sources and urls
+     */
+    private function sitemapParser(string $url): array {
         $parser = new SitemapParser($this->agentID, ['guzzle' => ['defaults' => [
                     'verify' => false,
                     'connect_timeout' => 5,
                     'timeout' => 10,
                 ], 'headers' => ['Accept-Encoding' => 'gzip, deflate']]]);
-        $this->findSitemap($parser, $url);
+        $this->sitemapParserGet($parser, $url);
         $sitemaps = [];
         foreach ($parser->getSitemaps() as $url => $tags) {
             $sitemaps[$url] = $tags;
@@ -158,7 +171,16 @@ class SitemapCrawler {
         return ['sources' => $sitemaps, "urls" => $urls];
     }
 
-    public function getSitemap($url) {
+    /**
+     * Get list of URLs using robots.txt or sitemap.xml
+     * 
+     * First try to use robots.txt, if it doesn't have sitemap.xml
+     * path defined (it should be) then use /sitemap.xml directly
+     * 
+     * @param string $url Base url, without suffix
+     * @return array Array of URLs to crawl
+     */
+    public function getSitemap(string $url): array {
         $parse = parse_url($url);
         if (!isset($parse['path']) || $parse['path'] == '') {
             $robotsLink = $url . '/robots.txt';
@@ -177,7 +199,12 @@ class SitemapCrawler {
         return $this->sitemapParser($crawlLink);
     }
 
-    public function crawlURLS($sitemap) {
+    /**
+     * Crawling of URLs taken from sitemap
+     * 
+     * @param array $sitemap Array of URLs to crawl one by one
+     */
+    public function crawlURLS(array $sitemap): bool {
         $ok = $bad = $cnt = 0;
         $start = microtime(true);
         $total = count($sitemap['urls']);
@@ -205,8 +232,15 @@ class SitemapCrawler {
         $elapsed = round(microtime(true) - $start) - ($this->sleep * $total);
         $rate = ROUND($total / $elapsed);
         $this->log("Elased: " . $elapsed . " seconds, rate $rate req/second");
+
+        return true;
     }
 
+    /**
+     * Add message to log
+     * 
+     * @param mixed $message Message to add to log
+     */
     private function log($message) {
         print $message . PHP_EOL;
     }
