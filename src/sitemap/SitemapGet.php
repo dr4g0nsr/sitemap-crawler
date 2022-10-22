@@ -1,6 +1,6 @@
 <?php
 
-namespace dr4g0nsr;
+namespace dr4g0nsr\sitemap;
 
 use vipnytt\SitemapParser;
 
@@ -9,42 +9,29 @@ use vipnytt\SitemapParser;
  *
  * @author drago
  */
-class SitemapGet {
+class SitemapGet extends SiteMapParse {
 
     const SC_VERSION = "1.0a";
 
     private $agentID = 'Sitemap Crawler ' . self::SC_VERSION;
-
+    protected $parser;
+    
+    public function __construct() {
+        parent::__construct();
+        $this->initParser();
+    }
+    
     /**
-     * Get URL list using recursive method
+     * Initialize parser with basic stuff
      * 
-     * @param type $parser
-     * @param type $url
-     * @return boolean
+     * @return void Nothing is returned
      */
-    private function sitemapParserGet(&$parser, $url) {
-        try {
-            $parser->parseRecursive($url);
-        } catch (Exception $e) {
-            print $e;
-            die;
-        }
-
-        $urlCounter = count($parser->getURLs());
-        if ($urlCounter < 1) {
-            $url = str_replace('/robots.txt', '/sitemap.xml', $url);
-            try {
-                $parser->parseRecursive($url);
-            } catch (Exception $e) {
-                print $e;
-                die;
-            }
-        }
-        $urlCounter = count($parser->getURLs());
-        if ($urlCounter < 1) {
-            return false;
-        }
-        return true;
+    protected function initParser():void {
+        $this->parser = new SitemapParser($this->agentID, ['guzzle' => ['defaults' => [
+                    'verify' => false,
+                    'connect_timeout' => 5,
+                    'timeout' => 10,
+                ], 'headers' => ['Accept-Encoding' => 'gzip, deflate']]]);
     }
 
     /**
@@ -54,18 +41,13 @@ class SitemapGet {
      * @return array Array of sources and urls
      */
     public function sitemapParser(string $url): array {
-        $parser = new SitemapParser($this->agentID, ['guzzle' => ['defaults' => [
-                    'verify' => false,
-                    'connect_timeout' => 5,
-                    'timeout' => 10,
-                ], 'headers' => ['Accept-Encoding' => 'gzip, deflate']]]);
-        $this->sitemapParserGet($parser, $url);
+        $this->sitemapParserGet($this->parser, $url);
         $sitemaps = [];
-        foreach ($parser->getSitemaps() as $url => $tags) {
+        foreach ($this->parser->getSitemaps() as $url => $tags) {
             $sitemaps[$url] = $tags;
         }
         $urls = [];
-        foreach ($parser->getURLs() as $url => $tags) {
+        foreach ($this->parser->getURLs() as $url => $tags) {
             $urls[$url] = $tags;
         }
         return ['sources' => $sitemaps, "urls" => $urls];

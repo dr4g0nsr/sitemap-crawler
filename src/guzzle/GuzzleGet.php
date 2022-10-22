@@ -1,33 +1,16 @@
 <?php
 
-namespace dr4g0nsr;
-
-use \GuzzleHttp\Client as Client;
+namespace dr4g0nsr\guzzle;
 
 /**
  * HTTP request sending and handling
  *
  * @author drago
  */
-class GuzzleURL {
-
-    private $httpClient = NULL;
-    private $verify = false;
-    private $connectTimeout = 5;
-    private $timeout = 10;
-    private $headers = ['Accept-Encoding' => 'gzip, deflate'];
-
-    /**
-     * Construct class and init dependicies
-     */
+class GuzzleGet extends GuzzleRequests implements IGuzzleGet {
+    
     public function __construct() {
-        $this->httpClient = new Client(
-                ['defaults' => [
-                'verify' => $this->verify,
-                'connect_timeout' => $this->connectTimeout,
-                'timeout' => $this->timeout,
-            ], 'headers' => $this->headers]
-        );
+        parent::__construct();
     }
 
     /**
