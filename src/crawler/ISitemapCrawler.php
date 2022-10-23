@@ -1,6 +1,6 @@
 <?php
 
-namespace dr4g0nsr;
+namespace dr4g0nsr\crawler;
 
 /**
  * Description of ISitemapCrawler
@@ -12,5 +12,5 @@ interface  ISitemapCrawler {
     public function getSitemap(string $url): array;
     
     public function crawlURLS(array $sitemap): bool;
-    
+
 }

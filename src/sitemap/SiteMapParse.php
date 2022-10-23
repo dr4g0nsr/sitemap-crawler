@@ -2,17 +2,14 @@
 
 namespace dr4g0nsr\sitemap;
 
-use dr4g0nsr\guzzle\GuzzleGet;
-
 /**
  * Description of SiteMapParser
  *
  * @author drago
  */
-class SiteMapParse extends GuzzleGet {
+class SiteMapParse {
 
     public function __construct() {
-        parent::__construct();
     }
 
     /**
