@@ -1,6 +1,6 @@
 # ALPHA VERSION, DO NOT USE ON PRODUCTION
 
-[![Test status](https://github.com/dr4g0nsr/sitemap-crawler/workflows/php/badge.svg)](https://github.com/dr4g0nsr/sitemap-crawler/actions)
+[![Test status](https://github.com/dr4g0nsr/sitemap-crawler/workflows/Composer/badge.svg)](https://github.com/dr4g0nsr/sitemap-crawler/actions)
 
 ## Sitemap Crawler
 
