@@ -1,5 +1,7 @@
 # ALPHA VERSION, DO NOT USE ON PRODUCTION
 
+[![Test status](https://github.com/dr4g0nsr/sitemap-crawler/workflows/php/badge.svg)](https://github.com/dr4g0nsr/sitemap-crawler/actions)
+
 ## Sitemap Crawler
 
 Crawler using sitemap to crawl site/regenerate cache.
