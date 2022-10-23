@@ -1,6 +1,6 @@
 <?php
 
-namespace dr4g0nsr;
+namespace dr4g0nsr\crawler;
 
 /**
  * Description of CrawlerBasic
@@ -12,15 +12,7 @@ trait TCrawlerBasic {
     private $settings = [];
     private $temporarySettings = [];
     private $prerequisites = ["curl_init", "mb_language"];
-
-    /**
-     * Static function to check version of class
-     * 
-     * @return string
-     */
-    public static function version(): string {
-        return self::SC_VERSION;
-    }
+    private $verbose = false;
 
     /**
      * Loads config and merge current one with loaded
@@ -59,19 +51,25 @@ trait TCrawlerBasic {
      * @param mixed $message Message to add to log
      */
     private function log($message) {
-        print $message . PHP_EOL;
+        if ($this->verbose) {
+            print $message . PHP_EOL;
+        }
     }
-    
-        /**
+
+    private function logDie($message) {
+        $this->log($message);
+        die;
+    }
+
+    /**
      * Check if we have basic stuff already installed
      * 
      * @return void
      */
-    protected function checkPrerequisites():void {
+    protected function checkPrerequisites(): void {
         foreach ($this->prerequisites as $ext) {
             if (!function_exists($ext)) {
-                print "Prerequisites failed: $ext\n";
-                die;
+                $this->logDie("Prerequisites failed: $ext");
             }
         }
     }
