@@ -60,6 +60,11 @@ class Crawler implements ICrawler {
         $this->sitemapCrawler->loadConfig($path);
     }
 
+    /**
+     * Get crawling statistics
+     * 
+     * @return array
+     */
     public function getStats(): array {
         return $this->sitemapCrawler->getStats();
     }

@@ -9,24 +9,24 @@ use vipnytt\SitemapParser;
  *
  * @author drago
  */
-class SitemapGet extends SiteMapParse {
+class SiteMapGet extends SiteMapParse {
 
     const SC_VERSION = "1.0a";
 
     private $agentID = 'Sitemap Crawler ' . self::SC_VERSION;
     protected $parser;
-    
+
     public function __construct() {
         parent::__construct();
         $this->initParser();
     }
-    
+
     /**
      * Initialize parser with basic stuff
      * 
      * @return void Nothing is returned
      */
-    protected function initParser():void {
+    protected function initParser(): void {
         $this->parser = new SitemapParser($this->agentID, ['guzzle' => ['defaults' => [
                     'verify' => false,
                     'connect_timeout' => 5,
@@ -47,10 +47,21 @@ class SitemapGet extends SiteMapParse {
             $sitemaps[$url] = $tags;
         }
         $urls = [];
+        if (!empty($sitemaps)) {
+            foreach ($sitemaps as $sitemap => $tags) {
+                $this->sitemapParserGet($this->parser, $sitemap);
+                $this->sitemapParserURL($urls);
+            }
+        } else {
+            $this->sitemapParserURL($urls);
+        }
+        return ['sources' => $sitemaps, "urls" => $urls];
+    }
+
+    private function sitemapParserURL(&$urls) {
         foreach ($this->parser->getURLs() as $url => $tags) {
             $urls[$url] = $tags;
         }
-        return ['sources' => $sitemaps, "urls" => $urls];
     }
 
 }
