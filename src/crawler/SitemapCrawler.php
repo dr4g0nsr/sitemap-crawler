@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace dr4g0nsr\crawler;
 
-use dr4g0nsr\sitemap\SitemapGet;
+use dr4g0nsr\sitemap\SiteMapGet;
 use dr4g0nsr\guzzle\GuzzleGet;
 
 /**
@@ -78,27 +78,31 @@ class SitemapCrawler extends SiteMapGet implements ISitemapCrawler {
         return $this->sitemapParser($crawlLink);
     }
 
+    private function crawlTiming($url, $result, $elapsed) {
+        if ($elapsed > $this->highestTime) {
+            $this->highestTime = ROUND($elapsed, 8);
+            $this->highestURL = $url;
+        }
+        if ($elapsed < $this->lowestTime) {
+            $this->lowestTime = ROUND($elapsed, 8);
+            $this->lowestURL = $url;
+        }
+        if ($result[0] > 199 && $result[0] < 300) {
+            $this->okURLs++;
+        } else {
+            $this->badURLs++;
+        }
+    }
+
     private function crawlSingleURL($sitemap) {
         foreach ($sitemap['urls'] as $url => $tags) {
-            if (in_array($url, $this->excluded)) {
+            if (in_array($url, $this->excluded) || empty($tags)) {
                 continue;
             }
             $start = microtime(true);
             $result = $this->guzzleGet->guzzlePage($url);
             $elapsed = microtime(true) - $start;
-            if ($elapsed > $this->highestTime) {
-                $this->highestTime = ROUND($elapsed, 8);
-                $this->highestURL = $url;
-            }
-            if ($elapsed < $this->lowestTime) {
-                $this->lowestTime = ROUND($elapsed, 8);
-                $this->lowestURL = $url;
-            }
-            if ($result[0] > 199 && $result[0] < 300) {
-                $this->okURLs++;
-            } else {
-                $this->badURLs++;
-            }
+            $this->crawlTiming($url, $result, $elapsed);
             $this->cnt++;
             $perc = ROUND((100 / $this->total) * $this->cnt);
             $this->log("Crawl URL: {$url} : {$perc}% done");
