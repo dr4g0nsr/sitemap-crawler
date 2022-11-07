@@ -16,7 +16,7 @@ final class CrawlTest extends TestCase {
     }
 
     public function testVersionOK(): void {
-        $version = "1.0a";
+        $version = "1.0";
         $this->assertEquals($version, Crawler::SC_VERSION);
         $this->assertEquals($version, Crawler::version());
     }
