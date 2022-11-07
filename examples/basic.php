@@ -5,7 +5,7 @@ require __DIR__ . '/config.php';
 
 use dr4g0nsr\Crawler;
 
-$url = 'https://bonneli-imago-011.co.rs';
+$url = 'https://candymapper.com';
 print "Crawler version: " . Crawler::version() . PHP_EOL;
 
 $crawler = new Crawler(['sleep' => 0, 'verbose' => true]);
