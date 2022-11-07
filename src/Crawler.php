@@ -12,7 +12,7 @@ use dr4g0nsr\guzzle\GuzzleGet;
  */
 class Crawler implements ICrawler {
 
-    const SC_VERSION = "1.0a";
+    const SC_VERSION = "1.0";
 
     private $sitemapCrawler = NULL;
     private $guzzleGet = NULL;
