@@ -36,8 +36,8 @@ class SiteMapParse {
                 print $e;
                 die;
             }
+            $urlCounter = count($parser->getURLs());
         }
-        $urlCounter = count($parser->getURLs());
         if ($urlCounter < 1) {
             return false;
         }

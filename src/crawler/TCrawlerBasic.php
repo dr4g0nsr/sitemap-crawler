@@ -12,7 +12,6 @@ trait TCrawlerBasic {
     private $settings = [];
     private $temporarySettings = [];
     private $prerequisites = ["curl_init", "mb_language"];
-    private $verbose = false;
 
     /**
      * Loads config and merge current one with loaded
@@ -51,7 +50,7 @@ trait TCrawlerBasic {
      * @param mixed $message Message to add to log
      */
     private function log($message) {
-        if ($this->verbose) {
+        if ($this->settings['verbose']) {
             print $message . PHP_EOL;
         }
     }
