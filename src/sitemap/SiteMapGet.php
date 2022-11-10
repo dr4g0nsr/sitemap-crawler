@@ -49,8 +49,10 @@ class SiteMapGet extends SiteMapParse {
         $urls = [];
         if (!empty($sitemaps)) {
             foreach ($sitemaps as $sitemap => $tags) {
-                $this->sitemapParserGet($this->parser, $sitemap);
-                $this->sitemapParserURL($urls);
+                $linksState = $this->sitemapParserGet($this->parser, $sitemap);
+                if ($linksState) {
+                    $this->sitemapParserURL($urls);
+                }
             }
         } else {
             $this->sitemapParserURL($urls);
