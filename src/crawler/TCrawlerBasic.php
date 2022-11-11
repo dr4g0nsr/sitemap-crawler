@@ -43,6 +43,21 @@ trait TCrawlerBasic {
     public function getSettings() {
         return $this->settings;
     }
+    
+    /**
+     * Set settings using array
+     * 
+     * @param array $settings Array of settings
+     * @return void
+     */
+     private function makeSettings(array $settings): void {
+        if (empty($settings)) {
+            return;
+        }
+        foreach ($settings as $setting => $value) {
+            $this->settings[$setting] = $value;
+        }
+    }
 
     /**
      * Add message to log
@@ -50,7 +65,7 @@ trait TCrawlerBasic {
      * @param mixed $message Message to add to log
      */
     private function log($message) {
-        if ($this->settings['verbose']) {
+        if (isset($this->settings['verbose']) && $this->settings['verbose']) {
             print $message . PHP_EOL;
         }
     }
