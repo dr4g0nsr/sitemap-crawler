@@ -42,15 +42,6 @@ class SitemapCrawler extends SiteMapGet implements ISitemapCrawler {
         parent::__construct();
     }
 
-    private function makeSettings(array $settings): void {
-        if (empty($settings)) {
-            return;
-        }
-        foreach ($settings as $setting => $value) {
-            $this->$setting = $value;
-        }
-    }
-
     /**
      * Get list of URLs using robots.txt or sitemap.xml
      * 
